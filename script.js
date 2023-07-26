@@ -87,15 +87,31 @@ const userName = (accounts) => {
   });
 };
 
-userName(accounts);
-console.log(accounts);
+const showBalance = (movements) => {
+  const balance = movements.reduce((acc, currVal) => acc + currVal, 0);
+  labelBalance.textContent = `${balance} EUR`;
+};
+showBalance(account1.movements);
 
-const deposits = movements.filter((movement) => {
-  return movement > 0;
-});
+const showBalanceSummary = (movements) => {
+  const cashIn = movements
+    .filter((movement) => movement > 0)
+    .reduce((acc, movement) => acc + movement, 0);
+  labelSumIn.textContent = `${cashIn}€`;
 
-const withdrawal = movements.filter((movement) => {
-  return movement < 0
-})
+  const cashOut = movements
+    .filter((movement) => movement < 0)
+    .reduce((acc, movement) => acc + movement, 0);
+  labelSumOut.textContent = `${Math.abs(cashOut)}€`;
 
-console.log(withdrawal);
+  const interest = movements
+    .filter((movement) => movement > 0)
+    .map((deposit) => (deposit * 1.2) / 100)
+    .reduce((acc, interest) => acc + interest, 0);
+  labelSumInterest.textContent = `${interest}`;
+};
+showBalanceSummary(account1.movements);
+
+const deposits = movements.filter((movement) => movement > 0);
+
+const withdrawal = movements.filter((movement) => movement < 0);
