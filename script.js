@@ -44,13 +44,15 @@ const inputTransferAmount = document.querySelector(".form__input--amount");
 const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
-const currencies = new Map([
-  ["USD", "United States dollar"],
-  ["EUR", "Euro"],
-  ["GBP", "Pound sterling"],
-]);
+
+// const currencies = new Map([
+//   ["USD", "United States dollar"],
+//   ["EUR", "Euro"],
+//   ["GBP", "Pound sterling"],
+// ]);
 
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
 const displayMovements = (movements) => {
   movements.forEach((movement, i) => {
     const type = movement > 0 ? "deposit" : "withdrawal";
@@ -79,8 +81,9 @@ userName(accounts);
 const deposits = movements.filter((movement) => {
   return movement > 0;
 });
-const showBalance = (movements) => {
-  const balance = movements.reduce((acc, currVal) => acc + currVal, 0);
+const showBalance = (account) => {
+  const balance = account.movements.reduce((acc, currVal) => acc + currVal, 0);
+  account.balance = balance;
   labelBalance.textContent = `${balance} EUR`;
 };
 
@@ -102,6 +105,16 @@ const showBalanceSummary = (account) => {
   labelSumInterest.textContent = `${interest}`;
 };
 
+const updateUI = (account) => {
+  displayMovements(account.movements);
+
+  showBalance(account);
+
+  showBalanceSummary(account);
+};
+
+// Login
+
 let currentAccount;
 
 btnLogin.addEventListener("click", (e) => {
@@ -120,9 +133,49 @@ btnLogin.addEventListener("click", (e) => {
   inputLoginUsername.value = inputLoginPin.value = "";
   inputLoginPin.blur();
 
-  displayMovements(currentAccount.movements);
-
-  showBalance(currentAccount.movements);
-
-  showBalanceSummary(currentAccount);
+  updateUI(currentAccount);
 });
+
+// Transfer Money
+
+btnTransfer.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const amount = Number(inputTransferAmount.value);
+  const receiverAccount = accounts.find(
+    (account) => account.username === inputTransferTo.value
+  );
+
+  inputLoginUsername.value = inputLoginPin.value = "";
+
+  if (
+    amount > 0 &&
+    receiverAccount &&
+    currentAccount.balance >= amount &&
+    receiverAccount?.username !== currentAccount.username
+  ) {
+    currentAccount.movements.push(-amount);
+    receiverAccount.movements.push(amount);
+  }
+  updateUI(currentAccount);
+});
+
+// Delete Account
+
+btnClose.addEventListener("click", (e) => {
+  inputLoginUsername.value = inputLoginPin.value = "";
+
+  e.preventDefault();
+
+  if (
+    inputCloseUsername.value === currentAccount.username &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    const index = accounts.findIndex(
+      (account) => account.username === currentAccount.username
+    );
+    accounts.splice(index, 1);
+    containerApp.style.opacity = 0;
+  }
+});
+ 
