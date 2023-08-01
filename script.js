@@ -53,7 +53,9 @@ const inputClosePin = document.querySelector(".form__input--pin");
 
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
-const displayMovements = (movements) => {
+const displayMovements = (movements, sort = false) => {
+  containerMovements.innerHTML = "";
+  const movements = sort ? movements.slice().sort((a, b) => a - b) : movements;
   movements.forEach((movement, i) => {
     const type = movement > 0 ? "deposit" : "withdrawal";
     const html = `
@@ -160,6 +162,24 @@ btnTransfer.addEventListener("click", (e) => {
   updateUI(currentAccount);
 });
 
+// Loan
+
+btnLoan.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+
+  if (
+    amount > 0 &&
+    currentAccount.movement.some((movement) => movement >= amount / 10)
+  ) {
+    currentAccount.movements.push(amount);
+    updateUI(currentAccount);
+  }
+
+  inputLoanAmount.value = "";
+});
+
 // Delete Account
 
 btnClose.addEventListener("click", (e) => {
@@ -178,4 +198,10 @@ btnClose.addEventListener("click", (e) => {
     containerApp.style.opacity = 0;
   }
 });
- 
+
+let sorted = false;
+btnSort.addEventListener("click", (e) => {
+  e.preventDefault();
+  displayMovements(currentAccount.movements, !sorted);
+  sorted = !sorted;
+});
