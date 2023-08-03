@@ -55,7 +55,7 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 const displayMovements = (movements, sort = false) => {
   containerMovements.innerHTML = "";
-  const movements = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  const movement = sort ? movement.slice().sort((a, b) => a - b) : movements;
   movements.forEach((movement, i) => {
     const type = movement > 0 ? "deposit" : "withdrawal";
     const html = `
